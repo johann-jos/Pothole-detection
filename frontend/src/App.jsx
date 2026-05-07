@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { UploadCloud, CheckCircle, AlertTriangle, Image as ImageIcon, Loader2, X } from 'lucide-react';
 
+const COMPLAINT_PORTAL_URL = 'https://portal.mcgm.gov.in/irj/portal/anonymous/qlcomplaintreg?3w5kPW=5LBjTyt3acn&guest_user=english';
+
 export default function App() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -56,10 +58,12 @@ export default function App() {
     formData.append('file', file);
 
     try {
-      const response = await axios.post('http://localhost:8000/detect', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await axios.post('http://localhost:8000/detect', formData);
       setResult(response.data);
+
+      if (response.data?.result === 'Pothole detected') {
+        window.location.assign(COMPLAINT_PORTAL_URL);
+      }
     } catch (err) {
       setError(err.response?.data?.detail || 'An error occurred during detection.');
     } finally {
